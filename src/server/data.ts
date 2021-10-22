@@ -4,7 +4,7 @@ import { Order, Product, ProductShortInfo } from '../common/types';
 const generateProducts = () => {
     const products: Product[] = []
 
-    for(let id = 0; id < 27; id++) {
+    for (let id = 0; id < 27; id++) {
         products.push({
             id,
             name: `${commerce.productAdjective()} ${commerce.product()}`,
