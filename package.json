@@ -7,6 +7,12 @@
         "build": "webpack --mode=production --node-env=production",
         "watch": "webpack --watch"
     },
+    "jest": {
+        "testURL": "http://localhost/hw/store",
+        "setupFilesAfterEnv": [
+            "<rootDir>/jest-setup.ts"
+        ]
+    },
     "dependencies": {
         "@bem-react/classname": "^1.5.12",
         "axios": "^0.23.0",
@@ -41,6 +47,7 @@
         "@types/react-helmet": "^6.1.4",
         "@types/react-router": "^5.1.17",
         "@types/react-router-dom": "^5.3.1",
+        "@types/testing-library__jest-dom": "^5.14.1",
         "@types/webpack": "^5.28.0",
         "babel-preset-expo": "^8.5.1",
         "css-loader": "^6.3.0",
