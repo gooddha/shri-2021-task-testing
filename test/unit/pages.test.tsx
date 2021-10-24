@@ -46,8 +46,6 @@ describe('Проверка ссылок и страниц', () => {
     expect(cartLink).toHaveAttribute('href', '/hw/store/cart');
   });
 
-
-
   it('По адресу /catalog должна открываться страница Catalog', () => {
     const basename = '/hw/store';
     const api = new ExampleApi(basename);
@@ -96,9 +94,6 @@ describe('Проверка ссылок и страниц', () => {
     expect(heading).toHaveTextContent('Delivery');
   });
 
-
-
-
   it('По адресу /contacts должна открываться страница Contacts', () => {
     const basename = '/hw/store';
     const api = new ExampleApi(basename);
@@ -123,7 +118,6 @@ describe('Проверка ссылок и страниц', () => {
     });
 
     expect(heading).toHaveTextContent('Contacts');
-    screen.logTestingPlaygroundURL();
   });
 
 
@@ -151,7 +145,6 @@ describe('Проверка ссылок и страниц', () => {
     });
 
     expect(heading).toHaveTextContent('Shopping cart');
-    screen.logTestingPlaygroundURL();
   });
 
 
