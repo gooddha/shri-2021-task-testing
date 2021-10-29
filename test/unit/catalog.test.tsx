@@ -1,45 +1,45 @@
 /**
  * @jest-environment jsdom
  */
-import { ProductShortInfo } from '../../src/common/types';
-import { it, expect } from '@jest/globals';
-import { render, screen, within, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Router } from 'react-router';
-import { createMemoryHistory } from 'history';
-import { Provider } from 'react-redux';
 import React from 'react';
+import { Router } from 'react-router';
+
+import { Provider, useSelector } from 'react-redux';
+import { createMemoryHistory } from 'history';
+
+import { it, expect } from '@jest/globals';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import events from '@testing-library/user-event';
+
+import { ProductShortInfo } from '../../src/common/types';
 import { initStore } from '../../src/client/store';
 import { ExampleApi, CartApi } from '../../src/client/api';
 import { Application } from '../../src/client/Application';
-import events from '@testing-library/user-event';
-import { commerce } from 'faker';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import { ProductItem } from '../../src/client/components/ProductItem';
+import { ApplicationState } from '../../src/client/store';
+
 
 describe('Проверка страницы Catalog', () => {
-
-
-  it('в каталоге должны отображаться товары, список которых приходит с сервера', async () => {
-    const mock = new MockAdapter(axios);
-
+  describe('Проверка отображения списка товаров', () => {
     const basename = '/hw/store';
     const api = new ExampleApi(basename);
 
     api.getProducts = async () => {
-
-      return await Promise.resolve<ProductShortInfo[]>([
-        {
-          id: 1,
-          name: `${commerce.productAdjective()} ${commerce.product()}`,
-          price: Number(commerce.price())
-        },
-        {
-          id: 2,
-          name: `${commerce.productAdjective()} ${commerce.product()}`,
-          price: Number(commerce.price())
-        }
-      ]);
+      //@ts-ignore
+      return await Promise.resolve<AxiosResponse<ProductShortInfo[], any>>({
+        data: [
+          {
+            id: 1,
+            name: `Test product 1`,
+            price: Number(1)
+          },
+          {
+            id: 2,
+            name: `Test product 2`,
+            price: Number(2)
+          }
+        ]
+      });
     }
 
     const cart = new CartApi();
@@ -49,20 +49,51 @@ describe('Проверка страницы Catalog', () => {
       initialIndex: 0
     });
 
-    const application = (
-      <Router history={history}>
-        <Provider store={store}>
-          <Application />
-        </Provider>
-      </Router>
-    );
+    it('В каталоге должны отображаться товары, список которых приходит с сервера', async () => {
+      const application = (
+        <Router history={history}>
+          <Provider store={store}>
+            <Application />
+          </Provider>
+        </Router>
+      );
 
-    const { getByRole, getByText } = render(application);
-    await waitForElementToBeRemoved(() => getByText(/loading/i));
-    // const itemsWithTestIds = await screen.findAllByTestId(/1337000/);
+      const { getByText } = render(application);
+      await waitForElementToBeRemoved(() => getByText(/loading/i));
+      const itemsWithTestIds = await screen.findAllByTestId(/[12]/);
+      const filtered = itemsWithTestIds.filter(item => {
+        return item.classList.contains('ProductItem')
+      });
 
-    screen.logTestingPlaygroundURL();
+      expect(filtered).toHaveLength(2)
+    });
 
+
+
+    it('Для каждого товара в каталоге отображается название, цена и ссылка на страницу с подробной информацией о товаре', async () => {
+
+      const application = (
+        <Router history={history}>
+          <Provider store={store}>
+            <Application />
+          </Provider>
+        </Router>
+      );
+
+      const { findAllByTestId, getByText } = render(application);
+      await waitForElementToBeRemoved(() => getByText(/loading/i));
+
+      const items = await findAllByTestId('1');
+      const itemBody = items.filter(item => item.classList.contains('ProductItem'))[0];
+
+      const itemName = [...itemBody.getElementsByClassName('ProductItem-Name')][0];
+      const itemPrice = [...itemBody.getElementsByClassName('ProductItem-Price')][0];
+      const itemLink = [...itemBody.getElementsByClassName('ProductItem-DetailsLink')][0];
+
+      expect(itemName).toHaveTextContent('Test product 1');
+      expect(itemPrice).toHaveTextContent('$1');
+      expect(itemLink).toHaveAttribute('href', '/catalog/1');
+    });
   });
 
 });
