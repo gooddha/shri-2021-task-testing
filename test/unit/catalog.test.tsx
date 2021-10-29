@@ -4,7 +4,7 @@
 import React from 'react';
 import { Router } from 'react-router';
 
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import { createMemoryHistory } from 'history';
 
 import { it, expect } from '@jest/globals';
@@ -142,12 +142,35 @@ describe('Проверка страницы Catalog', () => {
       expect(button).toHaveTextContent('Add to Cart');
       expect(color).toHaveTextContent('Test color');
       expect(material).toHaveTextContent('Test material');
-
-
-
-      screen.logTestingPlaygroundURL();
     });
 
+  });
+
+  describe('Проверка добавления в корзину', () => {
+    describe('В каталоге и на странице товара должно отображаться сообщение об этом', () => {
+
+      it('Клик на Add to Cart вызывает сообщение о том, что товар в корзине', async () => {
+        //@ts-ignore
+        const application = (
+          <Router history={history}>
+            <Provider store={store}>
+              <Application />
+            </Provider>
+          </Router>
+        );
+
+        const { findAllByTestId, getByText, getByRole } = render(application);
+
+        const button = getByRole('button', { name: /add to cart/i });
+
+        events.click(button);
+        const confirmation = getByText(/item in cart/i);
+        expect(confirmation).toBeInTheDocument();
+
+      });
+
+
+    });
   });
 
 
